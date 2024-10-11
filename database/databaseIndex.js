@@ -2,89 +2,34 @@ const mongoose=require("mongoose");
 const schema=mongoose.Schema;
 const ObjectId=mongoose.ObjectId;
 
-// mongoose.connect("mongodb+srv://randomadmin:9mVRp2O5Y9AI6Erz@cluster0.if7ev.mongodb.net/CourseSelling");
+//basically the req body will look like this: {name, email, password, age, risk, monthlyIncome, insurences: ["ksdjnc","dscjkn","sdc"], estimatedExpenses, savingorInvestement: {mutualFunds: {"ds":"sc"},virtualGold: 12, equity: {"dewwe":"23"}}}
 
-let user=new schema({ //the object id is created automatically and is an uuid which is a highly randomised string, sso the chances
-    // of duplicate uuids is very-very low
+let user=new schema({ 
     name: String,
     email: {type: String,unique: true,trim: true},
     password: String,
     profilePicture: String,
-    dateOfBirth: Date,
-    bio: String
+    age: Number,//i can take dob and calc age, but ig this will work fine
+    risk: Number,
+    monthlyIncome: Number,
+    insurances: [String],
+    estimatedExpenses: Number,
+    // savingorInvestement: {type: Map, of: [String]}
 },{timestamps: true})
 
-let course=new schema({
-    instructorId: ObjectId,
-    contentId: ObjectId,
-    title: String,
-    description: String,
-    category: String,
-    price: Number,
-    language: String,
-    level: String,
-    duration: Number,
-    coverImg: String //to store an image we should simply store its url or convert it to base 64 then store it, this is the best approach, instead of storing the actual img on the db
-},{timestamps: true})
-
-let courseContent= new schema({
-    courseId: String,
-    sections: [String], //(array containing multiple sections; each section has title, order, and lessons)
-    lessons: [String], //(array of lessons, each containing lesson_id, title, content_type (video, PDF, quiz), and content_url)
-    quizzes: {
-        type: Map,
-        of: String
-    } //(array of quiz objects with questions, options, and correct answers)
-    // assignments: //(if applicable, include assignment details and submission instructions)
-},{timestamps: true})
-
-let section= new schema({
-    title: String,
-    order: Number,
-    description: String,
-    lessons: [String]
-},{timestamps: true})
-
-let lesson= new schema({
-    title: String,
-    content_type: String,
-    content_url: String,
-    duration: Number,
-    order: Number,
-    is_preview: Boolean
-},{timestamps: true})
-
-let instructor=new schema({
-    // courseId: ObjectId,
-    name: String,
-    email: {type: String,unique: true,trim: true},
-    password: String,
-    profilePicture: String,
-    dateOfBirth: Date,
-    bio: String
-},{timestamps: true})
-
-let purchase=new schema({
+let savingorInvestement=new schema({
     userId: ObjectId,
-    courseId: ObjectId
-},{timestamps: true})
+    equity: {type: Map,of: String},
+    mutualFunds: {type: Map,of: String},
+    virtualGold: Number,
+ })
 
-// purchase.findUserByEmailorName=function(){}//this way we can define custom functions to the schema
+//i can store survey data and user data in diff collections, for multiple different surveys related to one user
 
 let userModel=mongoose.model("users",user)
-let courseModel=mongoose.model("courses",course)
-let instructorModel=mongoose.model("instructors",instructor)
-let purchasesModel=mongoose.model("purchases",purchase)
-let courseContentModel=mongoose.model("coursecontents",courseContent)
-let lessonModel=mongoose.model("lessons",lesson)
-let sectionModel=mongoose.model("sections",section)
+let savingsModel=mongoose.model("savingsorInvestements",savingorInvestement)
 
 module.exports={
-    userModel, 
-    courseModel, 
-    instructorModel, 
-    purchasesModel,
-    courseContentModel,
-    lessonModel,
-    sectionModel
+    userModel,
+    savingsModel
 }
