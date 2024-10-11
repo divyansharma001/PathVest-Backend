@@ -40,7 +40,7 @@ userRouter.post('/signup',async (req, res) => {
         estimatedExpenses: z.number().min(0, "Estimated expenses must be positive"),
         savingorInvestement: z.object({
             mutualFunds: z.record(z.string(), z.string()).optional(), 
-            virtualGold: z.number().min(0, "Virtual gold value must be non-negative"),
+            virtualGold: z.number().min(0, "Virtual gold value must be non-negative").optional(),
             equity: z.record(z.string(), z.string()).optional(), 
         })
     })

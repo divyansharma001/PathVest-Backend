@@ -22,7 +22,8 @@ app.get("/healthy", (req, res)=> res.send("I am Healthy"));
 async function main(){
     try{
         await mongoose.connect(connectionString);
-        app.listen(3000);
+        app.listen(3000,()=>{console.log("The Server is Running at port: 3000");
+        });
     }
     catch(err){
         console.log("Error connecting to the DB, closing server till connection succeds. Err Status: "+err);
