@@ -14,7 +14,7 @@ const Secret_Key=process.env.Secret_Key;
 
 const z=require("zod")
 
-// const {userAuthentication} = require("../middlewares/usermiddleware")
+const {userAuthentication} = require("../middlewares/usermiddleware")
 
 //basically the req body will look like this: {name, email, password, age, risk, monthlyIncome, insurences: ["ksdjnc","dscjkn","sdc"], estimatedExpenses, savingorInvestement: {mutualFunds: {"ds":"sc"},virtualGold: 12, equity: {"dewwe":"23"}}}
 
@@ -89,14 +89,12 @@ userRouter.post('/signup',async (req, res) => {
         }
 
         token=jwt.sign({ 
-            email,
             userId: newUser._id
         },Secret_Key); 
 
         res.status(200).json({
             message: `Signup Complete, for ${newUser.name}!!!`,
-            token: token,
-            email
+            token: token
             // profileImg: newUser.profileImg,
         });
         return;
@@ -143,15 +141,13 @@ userRouter.post("/login",async (req,res)=>{
         }
         if(userFound&&passwordMatch){
             
-            token=jwt.sign({ 
-                email,
+            token=jwt.sign({
                 userId: userFound._id
             },Secret_Key); 
 
             res.json({
                 message: `Hey ${userFound.name}!, you are Logged In!!!!`,
-                token: token,
-                email: userFound.email
+                token: token
             });
             return;
         }
@@ -172,6 +168,23 @@ userRouter.post("/login",async (req,res)=>{
     }
 });
 
+userRouter.get("/",userAuthentication,async (req,res)=>{//if the control is reaching then most prolly the user exists except for
+    // the case when user deletes his acc
+    let userId=req.userId;
+    let user=await userModel.findById(userId);
+    let usersavingorInvestement=await savingsModel.find({
+        userId
+    })
+    if(user){
+        let responseData=Object.assign(user, usersavingorInvestement)
+        responseData["password"]=undefined
+        responseData['__v']=undefined
+        res.json({
+            message: "Fetching data",
+            data: Object.assign(user, usersavingorInvestement)
+        })
+    }
+})
 
 module.exports= {
     userRouter

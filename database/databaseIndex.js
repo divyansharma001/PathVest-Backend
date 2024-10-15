@@ -14,7 +14,7 @@ let user=new schema({
     monthlyIncome: Number,
     insurances: [String],
     estimatedExpenses: Number,
-    // savingorInvestement: {type: Map, of: [String]}
+    // savingorInvestement: [{type: ObjectId, ref: "savingsorInvestements"}]//will be storing object id of the savorInv model here
 },{timestamps: true})
 
 let savingorInvestement=new schema({

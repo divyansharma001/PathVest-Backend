@@ -11,11 +11,11 @@ const connectionString=process.env.databaseConnectionString;
 
 let {userRouter} =require("./routes/user");
 
-app.use(cors())
+app.use(cors())//will change this later
 
 app.use(express.json());
 
-app.use(userRouter);
+app.use("/user",userRouter);
 
 app.get("/healthy", (req, res)=> res.send("I am Healthy"));
 
