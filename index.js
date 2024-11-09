@@ -11,13 +11,15 @@ const connectionString=process.env.databaseConnectionString;
 
 let {userRouter} =require("./routes/user");
 let {chatRouter}=require("./routes/chat")
+let {recommendationsRouter}=require("./routes/recommendations")
 
 app.use(cors())//will change this later
 
 app.use(express.json());
 
 app.use("/user",userRouter);
-app.use("/chat",chatRouter)
+app.use("/chat",chatRouter);
+app.use("/recommendations",recommendationsRouter);
 
 app.get("/healthy", (req, res)=> res.send("I am Healthy"));
 

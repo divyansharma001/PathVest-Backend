@@ -9,7 +9,8 @@ const expenseSchema = new Schema({
     name: { type: String, required: true },
     category: { type: String, required: true },
     price: { type: Number, required: true },
-    description: String
+    description: String,
+    
 }, { 
     timestamps: true 
 });
@@ -32,7 +33,8 @@ const UserSchema = new Schema({
     insurances: [String],
     expenses: [{ type: Schema.Types.ObjectId, ref: 'expenses' }],
     estimatedExpenses: { type: Number, required: true },
-    savingsOrInvestments: { type: Schema.Types.ObjectId, ref: 'savingsorInvestements' }
+    savingsOrInvestments: { type: Schema.Types.ObjectId, ref: 'savingsorInvestements' },
+    riskProfile: String,
 }, {
     timestamps: true,
     // This ensures the schema matches the existing collection
