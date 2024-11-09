@@ -1,49 +1,52 @@
-const mongoose=require("mongoose");
-const schema=mongoose.Schema;
-const ObjectId=mongoose.ObjectId;
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema; // Using proper capitalization for Schema
+const ObjectId = mongoose.Types.ObjectId; // Using mongoose.Types.ObjectId for better type safety
 
-//basically the req body will look like this: {name, email, password, age, risk, monthlyIncome, insurences: ["ksdjnc","dscjkn","sdc"], estimatedExpenses, savingorInvestement: {mutualFunds: {"ds":"sc"},virtualGold: 12, equity: {"dewwe":"23"}}}
-
-const user=new schema({ 
-    name: String,
-    email: {type: String,unique: true,trim: true},
-    password: String,
-    profilePicture: String,
-    age: Number,//i can take dob and calc age, but ig this will work fine
-    risk: Number,
-    monthlyIncome: Number,
-    insurances: [String],
-    expenses: [ObjectId],
-    estimatedExpenses: Number,
-    // savingorInvestement: [{type: ObjectId, ref: "savingsorInvestements"}]//will be storing object id of the savorInv model here
-},{timestamps: true})
-
-const savingorInvestement=new schema({
-    userId: ObjectId,
-    equity: {type: Map,of: String},
-    mutualFunds: {type: Map,of: String},
-    virtualGold: Number,
- })
-
- const expenseSchema = new schema({
-    userId: ObjectId,
+// Expense Schema
+const expenseSchema = new Schema({
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     imageUrl: String,
-    name: String,
-    category: String,
-    price: Number,
+    name: { type: String, required: true },
+    category: { type: String, required: true },
+    price: { type: Number, required: true },
     description: String
-}, { timestamps: true });
+}, { 
+    timestamps: true 
+});
 
- 
+// Savings/Investment Schema
+const savingOrInvestmentSchema = new Schema({
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    equity: { type: Map, of: String },
+    mutualFunds: { type: Map, of: String },
+    virtualGold: Number
+}, {
+    timestamps: true
+});
 
-//i can store survey data and user data in diff collections, for multiple different surveys related to one user
+// User Schema - This will update the existing User collection
+const UserSchema = new Schema({ 
+    age: { type: Number, required: true },
+    risk: { type: Number, required: true },
+    monthlyIncome: { type: Number, required: true },
+    insurances: [String],
+    expenses: [{ type: Schema.Types.ObjectId, ref: 'expenses' }],
+    estimatedExpenses: { type: Number, required: true },
+    savingsOrInvestments: { type: Schema.Types.ObjectId, ref: 'savingsorInvestements' }
+}, {
+    timestamps: true,
+    // This ensures the schema matches the existing collection
+    collection: 'User'
+});
 
-let userModel=mongoose.model("users",user)
-let savingsModel=mongoose.model("savingsorInvestements",savingorInvestement)
-let expenseModel=mongoose.model("expenses",expenseSchema)
+// Create models
+const ExpenseModel = mongoose.model('expenses', expenseSchema);
+const SavingsModel = mongoose.model('savingsorInvestements', savingOrInvestmentSchema);
+// Use the existing "User" collection
+const userModel = mongoose.model('User', UserSchema);
 
-module.exports={
+module.exports = {
     userModel,
-    savingsModel,
-    expenseModel
-}
+    SavingsModel,
+    ExpenseModel
+};

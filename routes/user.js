@@ -166,6 +166,39 @@ userRouter.post("/login",async (req,res)=>{
         return;
     }
 });
+//create a registration endpoint , that takes in the survey form data, same as it was taken in the signup ep and stores it in the db    
+userRouter.post("/register",userAuthentication,async (req,res)=>{
+    // let userId=req.userId;
+    let userId=req.body.email;
+    // console.log(userId);
+    
+    let user=await userModel.findOne({email: userId});
+    
+    
+    if(user){
+        let userSurveyData=req.body;
+
+        try{
+            let surveyData=await userModel.updateOne({email: userId},userSurveyData);
+            res.json({
+                message: "User Survey Data Added Successfully",
+                data: surveyData
+            })
+        }
+        catch(e){
+            res.status(500).json({
+                message: "Error while adding user survey data",
+                error: e
+            })
+        }
+    }
+    else{
+        res.status(401).json({
+            message: "User doesn't exist"
+        })
+    }
+})
+
 
 userRouter.get("/",userAuthentication,async (req,res)=>{//if the control is reaching then most prolly the user exists except for
     // the case when user deletes his acc
