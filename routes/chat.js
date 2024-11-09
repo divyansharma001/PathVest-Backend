@@ -14,33 +14,22 @@ if (!grok_key) {
   }
 
 
-chatRouter.post((req,res)=>{//body=> {authorisation:"";prompt:""}
-    let prompt=req.body.prompt;
-    if (!prompt) {
-        return res.status(400).json({ error: "User input is required" });
-      }
+chatRouter.post((req,res)=>{//body=> {authorisation:"";conversationHistory:"";prompt:""}
     
-})
-
-module.exports= {
-    chatRouter
-}
-
-export default async function chatController(req, res) {
-  try {
-    const { userInput, conversationHistory } = req.body;
-
-    if (!userInput) {
-      return res.status(400).json({ error: "User input is required" });
+      
+    try {
+    
+    let { prompt, conversationHistory }=req.body;
+    
+    if (!prompt) {
+      return res.status(400).json({ error: "Prompt is required" });
     }
 
     const history = Array.isArray(conversationHistory)
       ? conversationHistory
       : [];
 
-      const codeForAi = typeof userInput === "string"
-      ? JSON.stringify(userInput).slice(1, -1)
-      : JSON.stringify(userInput);
+      const prompt = JSON.stringify(prompt);//dont need it ig
     
 
     const messages = [
@@ -52,7 +41,7 @@ export default async function chatController(req, res) {
       ...history,
       {
         role: "user",
-        content: codeForAi,
+        content: prompt,
       },
     ];
 
@@ -70,4 +59,9 @@ export default async function chatController(req, res) {
       .status(500)
       .json({ error: "An error occurred while processing your request." });
   }
+    
+})
+
+module.exports= {
+    chatRouter
 }
