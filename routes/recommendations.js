@@ -1,41 +1,52 @@
 function calculateAllocation(age, profile) {
     const maxAllocation = 100 - age;
     let allocation = {};
-  
-    switch (profile) {//high,medium,low
-      case "high":
-        allocation = {
-          equity: maxAllocation * 0.8,
-          property: maxAllocation * 0.15,
-          commodities: maxAllocation * 0.05,
-          debt: age * 0.5,
-        };
-        break;
-  
-      case "medium":
-        allocation = {
-          equity: maxAllocation * 0.6,
-          property: maxAllocation * 0.2,
-          commodities: maxAllocation * 0.1,
-          debt: age,
-        };
-        break;
-  
-      case "low":
-        allocation = {
-          equity: maxAllocation * 0.4,
-          property: maxAllocation * 0.15,
-          commodities: maxAllocation * 0.05,
-          debt: age + maxAllocation * 0.4,
-        };
-        break;
-  
-      default:
-        throw new Error("Invalid risk profile");
+
+    switch (profile) {
+        case "high":
+            allocation = {
+                equity: Math.round(maxAllocation * 0.8),
+                property: Math.round(maxAllocation * 0.15),
+                commodities: Math.round(maxAllocation * 0.05),
+                debt: Math.round(age * 0.5),
+            };
+            break;
+
+        case "medium":
+            allocation = {
+                equity: Math.round(maxAllocation * 0.6),
+                property: Math.round(maxAllocation * 0.2),
+                commodities: Math.round(maxAllocation * 0.1),
+                debt: age,
+            };
+            break;
+
+        case "low":
+            allocation = {
+                equity: Math.round(maxAllocation * 0.4),
+                property: Math.round(maxAllocation * 0.15),
+                commodities: Math.round(maxAllocation * 0.05),
+                debt: Math.round(age + maxAllocation * 0.4),
+            };
+            break;
+
+        default:
+            throw new Error("Invalid risk profile");
     }
-  
+
+    // Adjust the total to ensure it sums to 100%
+    const total = allocation.equity + allocation.property + allocation.commodities + allocation.debt;
+    const adjustment = 100 - total;
+
+    if (adjustment !== 0) {
+        allocation.debt += adjustment;
+    }
+
     return allocation;
 }
+
+// console.log(calculateAllocation(30, "high"));
+
 //   const age = 30;
 //   const profile = "medium";
 //   const allocation = calculateAllocation(age, profile);
@@ -74,8 +85,8 @@ recommendationsRouter.post('/', async (req, res) => {//post req with {email: "";
             return res.status(404).send('User not found');
         }
 
-        const { age, riskProfile } = userData[0];
-        console.log(userData);
+        const { age, riskProfile } = userData;
+        console.log(riskProfile)
         
         const allocation = calculateAllocation(age, riskProfile);
 
@@ -86,6 +97,11 @@ recommendationsRouter.post('/', async (req, res) => {//post req with {email: "";
     } catch (error) {
         res.status(500).send('Internal Server Error');
         console.log(error);
+        
+        res.json({
+            email,
+            allocation: calculateAllocation(20, "high")
+        });
         
     }
 });
