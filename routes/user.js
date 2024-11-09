@@ -1,7 +1,7 @@
 const express=require("express");
 const userRouter=express.Router();
 
-const {userModel, savingsModel}=require("../database/databaseIndex")
+const {userModel, savingsModel, expenseModel }=require("../database/databaseIndex")
 
 const bcrypt=require("bcrypt");
 const saltingRounds=10;
@@ -107,7 +107,6 @@ userRouter.post('/signup',async (req, res) => {
         return;
     }    
 });
-     
 
 userRouter.post("/login",async (req,res)=>{
 
@@ -170,21 +169,110 @@ userRouter.post("/login",async (req,res)=>{
 
 userRouter.get("/",userAuthentication,async (req,res)=>{//if the control is reaching then most prolly the user exists except for
     // the case when user deletes his acc
-    let userId=req.userId;
-    let user=await userModel.findById(userId);
-    let usersavingorInvestement=await savingsModel.find({
-        userId
-    })
-    if(user){
-        let responseData=Object.assign(user, usersavingorInvestement)
-        responseData["password"]=undefined
-        responseData['__v']=undefined
-        res.json({
-            message: "Fetching data",
-            data: Object.assign(user, usersavingorInvestement)
+    try{
+        let userId=req.userId;
+        let user=await userModel.findById(userId);
+        let usersavingorInvestement=await savingsModel.find({
+            userId
+        });
+
+        if(user){
+            let responseData=Object.assign(user, usersavingorInvestement)
+            responseData["password"]=undefined
+            responseData['__v']=undefined
+            res.json({
+                message: "Data Fetched Successfully",
+                data: responseData
+            })
+        }
+    }
+    catch(e){
+        console.log(e);       
+        res.status(500).json({
+            message: "Error while fetching data",
+            error: e
         })
     }
 })
+userRouter.post("/expenses", userAuthentication, async (req, res) => {
+    let expenseValidData = z.object({
+        imageUrl: z.string().url(),
+        name: z.string().min(2, "Name must be at least 2 characters long"),
+        category: z.string().min(2, "Category must be at least 2 characters long"),
+        price: z.number().min(0, "Price must be positive"),
+        description: z.string().min(2, "Description must be at least 2 characters long")
+    });
+
+    let validateData = expenseValidData.safeParse(req.body);
+
+    if (validateData.success) {
+        let userId = req.userId;
+        let { imageUrl, name, category, price, description } = req.body;
+
+        try {
+            let newExpense = await expenseModel.create({
+                userId,
+                imageUrl,
+                name,
+                category,
+                price,
+                description
+            });
+
+            await userModel.updateOne(
+                { _id: userId },
+                { $push: { expenses: newExpense._id } }
+            );
+
+            res.json({
+                message: "Expense Added Successfully",
+                data: newExpense
+            });
+        } catch (e) {
+            res.status(500).json({
+                message: "Error while adding expense",
+                error: e
+            });
+        }
+    } else {
+        res.status(401).json({
+            message: validateData.error.issues[0].message,
+            description: validateData.error.issues[0].path
+        });
+    }
+});
+
+userRouter.get("/expenses", userAuthentication, async (req, res) => {
+    try {
+        let userId = req.userId;
+        console.log(userId);
+
+        let user = await userModel.findById(userId);
+        // console.log(user);
+
+        if (user) {
+            let userExpenses = await expenseModel.find({
+                userId: userId
+            });
+            console.log(userExpenses);
+
+            res.json({
+                message: "Data Fetched Successfully",
+                data: userExpenses
+            });
+        } else {
+            res.status(401).json({
+                message: "User doesn't exist"
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        res.status(500).json({
+            message: "Error while fetching data",
+            error: e
+        });
+    }
+});
 
 module.exports= {
     userRouter
