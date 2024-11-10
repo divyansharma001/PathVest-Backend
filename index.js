@@ -4,7 +4,15 @@ const app=express();
 const env=require("dotenv")
 env.config()
 
-const cors=require("cors")
+const cors=require("cors");
+
+const corsOptions = {
+    origin: '*',
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 
 const mongoose=require("mongoose")
 const connectionString=process.env.databaseConnectionString;
@@ -13,7 +21,7 @@ let {userRouter} =require("./routes/user");
 let {chatRouter}=require("./routes/chat")
 let {recommendationsRouter}=require("./routes/recommendations")
 
-app.use(cors())//will change this later
+app.use(express.urlencoded({extended:true}));
 
 app.use(express.json());
 
