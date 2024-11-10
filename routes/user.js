@@ -228,7 +228,7 @@ userRouter.post("/register",async (req,res)=>{
     let user=await userModel.findOne({email: userId});
     
     
-    if(user){
+    
         let userSurveyData=req.body;
 
         try{
@@ -238,7 +238,7 @@ userRouter.post("/register",async (req,res)=>{
                 goalType: req.body.goalType,
                 targetAmount: req.body.targetAmount,
                 timeFrame: req.body.timeFrame,
-                priority: req.body.priority   //{email,goalType,targetAmount,timeFrame,priority,assetClass,allocationPercentage}  
+                priority: req.body.priority   
             });
             const assetClass = await assetModel.create({
                 email: userId,
@@ -256,12 +256,7 @@ userRouter.post("/register",async (req,res)=>{
                 error: e
             })
         }
-    }
-    else{
-        res.status(401).json({
-            message: "User doesn't exist"
-        })
-    }
+    
 })
 
 //create a get endpoint that fetches the user data and the survey form data
