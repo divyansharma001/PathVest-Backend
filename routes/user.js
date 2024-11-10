@@ -238,7 +238,7 @@ userRouter.post("/register",async (req,res)=>{
                 goalType: req.body.goalType,
                 targetAmount: req.body.targetAmount,
                 timeFrame: req.body.timeFrame,
-                priority: req.body.priority
+                priority: req.body.priority   //{email,goalType,targetAmount,timeFrame,priority,assetClass,allocationPercentage}  
             });
             const assetClass = await assetModel.create({
                 email: userId,

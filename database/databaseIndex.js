@@ -4,11 +4,11 @@ const ObjectId = mongoose.Types.ObjectId; // Using mongoose.Types.ObjectId for b
 
 // Expense Schema
 const expenseSchema = new Schema({
-    email: { type:String, required: true },
+    email: { type:String},
     imageUrl: String,
-    name: { type: String, required: true },
-    category: { type: String, required: true },
-    price: { type: Number, required: true },
+    name: { type: String},
+    category: { type: String  },
+    price: { type: Number},
     description: String,
 }, { 
     timestamps: true 
@@ -31,7 +31,7 @@ const UserSchema = new Schema({
     monthlyIncome: { type: Number, required: true },
     insurances: [String],
     expenses: [{ type: Schema.Types.ObjectId, ref: 'expenses' }],
-    estimatedExpenses: { type: Number, required: true },
+    estimatedExpenses: { type: Number },
     savingsOrInvestments: { type: Schema.Types.ObjectId, ref: 'savingsorInvestements' },
     riskProfile: String
 }, {
@@ -40,9 +40,9 @@ const UserSchema = new Schema({
     collection: 'User'
 });
 const financialSchema = new Schema({ 
-    goalType: { type: Number, required: true },
-    targetAmount: { type: Number, required: true },
-    timeFrame: { type: Number, required: true },
+    goalType: { type: Number },
+    targetAmount: { type: Number },
+    timeFrame: { type: Number },
     priority: [String],
     email: String
 });
